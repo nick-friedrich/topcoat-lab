@@ -14,7 +14,7 @@ use crate::features::{compiler, post::Post};
 
 /// Every visitor starts with the most famous borrow-checker error.
 const STARTER: &str = r#"fn main() {
-    let greeting = String::from("Hello from the wall!");
+    let greeting = String::from("Hello, wall!");
     let moved = greeting;
     println!("{greeting}");
 }
@@ -30,18 +30,18 @@ pub async fn page(cx: &Cx) -> Result<impl View> {
 
     Ok(view! {
         <main class="wall min-h-screen bg-[#f6efe3] text-[#2b1d14]">
-            <div class="mx-auto max-w-6xl px-6 py-12">
-                <header class="mb-10">
+            <div class="mx-auto max-w-7xl px-8 py-8">
+                <header class="mb-6">
                     <p class="font-mono text-sm tracking-widest text-[#b7410e] uppercase">"guestbook.rs"</p>
-                    <h1 class="mt-2 text-6xl font-bold tracking-tight">"It Compiles."</h1>
-                    <p class="mt-3 max-w-xl text-lg text-[#6b5444]">
+                    <h1 class="mt-1 text-5xl font-bold tracking-tight">"It Compiles."</h1>
+                    <p class="mt-2 max-w-2xl text-lg text-[#6b5444]">
                         "Leave a message. The catch: your message is a Rust program, and "
                         <code class="font-mono text-[#b7410e]">"rustc"</code>
                         " has to accept it."
                     </p>
                 </header>
 
-                <div class="grid gap-8 lg:grid-cols-[1.1fr_1fr]">
+                <div class="grid gap-8 lg:grid-cols-[1.25fr_1fr]">
                     <section class="rounded-2xl border border-[#e3d5c0] bg-white/70 p-5">
                         <label class="text-sm font-medium" for="author">"Your name"</label>
                         input(attrs: attributes! {
@@ -53,7 +53,8 @@ pub async fn page(cx: &Cx) -> Result<impl View> {
                         })
                         <div class="editor rounded-xl bg-[#1d1611] p-4">
                             <textarea
-                                class="block h-56 w-full resize-none bg-transparent font-mono text-[15px] leading-6 text-[#f3e6d4] outline-none"
+                                wrap="off"
+                                class="block h-40 w-full resize-none overflow-x-auto bg-transparent font-mono text-[15px] leading-6 text-[#f3e6d4] outline-none"
                                 spellcheck="false"
                                 @input=$(|e: Event| code.set(e.target.value))
                             >(STARTER)</textarea>

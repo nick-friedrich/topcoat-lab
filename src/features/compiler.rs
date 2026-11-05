@@ -3,7 +3,14 @@
 //! The wall never runs anyone's code. It only asks `rustc` whether the code compiles,
 //! and stops it after a few seconds.
 
-use std::{process::Stdio, sync::LazyLock, time::{Duration, Instant}};
+use std::{
+    process::Stdio,
+    sync::{
+        LazyLock,
+        atomic::{AtomicU64, Ordering},
+    },
+    time::{Duration, Instant},
+};
 
 use serde::Deserialize;
 use tokio::{io::AsyncWriteExt, process::Command, sync::Semaphore};
@@ -75,8 +82,15 @@ pub async fn check(code: &str) -> Verdict {
     let _slot = SLOTS.acquire().await.unwrap();
     let started = Instant::now();
 
+    // rustc writes a small metadata file and needs a writable folder for it.
+    static RUNS: AtomicU64 = AtomicU64::new(0);
+    let dir = std::env::temp_dir().join("topcoat-wall");
+    let _ = std::fs::create_dir_all(&dir);
+    let out = dir.join(format!("{}.rmeta", RUNS.fetch_add(1, Ordering::Relaxed)));
+
     let child = Command::new("rustc")
-        .args(["--edition=2024", "--crate-name=wall", "--emit=metadata=/dev/null"])
+        .args(["--edition=2024", "--crate-name=wall"])
+        .arg(format!("--emit=metadata={}", out.display()))
         .args(["--error-format=json", "-"])
         .stdin(Stdio::piped())
         .stdout(Stdio::null())
@@ -95,11 +109,13 @@ pub async fn check(code: &str) -> Verdict {
         Ok(Ok(output)) => output,
         _ => return Verdict::refused("rustc took longer than five seconds."),
     };
+    let _ = std::fs::remove_file(&out);
 
     let diagnostics = String::from_utf8_lossy(&output.stderr)
         .lines()
         .filter_map(|line| serde_json::from_str::<Json>(line).ok())
-        .filter(|d| !d.spans.is_empty())
+        // Skip the closing "aborting due to 1 previous error" summary.
+        .filter(|d| !d.spans.is_empty() || (d.level == "error" && !d.message.starts_with("aborting")))
         .map(Diagnostic::from)
         .collect();
 
