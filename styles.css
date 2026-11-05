@@ -1,0 +1,208 @@
+/* Neutral, the built-in Topcoat theme.
+
+   The theme is a small set of design tokens. Components refer to tokens only,
+   never to raw colors, so a project restyles itself by editing the values in
+   `:root` and `.dark` below.
+
+     --background              the page background
+     --foreground              text and iconography on the background
+     --card                    cards and panel backgrounds
+     --card-foreground         text and iconography on cards and panels
+     --popover                 floating menu and popover backgrounds
+     --popover-foreground      text and iconography on floating surfaces
+     --muted-foreground        secondary text: captions, descriptions, placeholders
+     --primary                 the emphasis color: primary actions, selection, highlights
+     --primary-foreground      text on a primary-filled surface
+     --destructive             destructive actions and error states
+     --destructive-foreground  text on a destructive-filled surface
+     --border                  hairline borders and dividers
+     --ring                    the focus ring
+     --sidebar                 the sidebar background
+     --sidebar-foreground      sidebar text and icons
+     --sidebar-primary         primary actions inside the sidebar
+     --sidebar-primary-foreground  text on sidebar primary actions
+     --sidebar-accent          sidebar hover and selected backgrounds
+     --sidebar-accent-foreground   text on sidebar accents
+     --sidebar-border          sidebar borders and dividers
+     --sidebar-ring            sidebar focus rings
+     --shadow-xs               a subtle shadow for raised controls
+     --shadow-sm               a shadow for raised surfaces: cards, menus
+
+   Shadows are disabled by default. To enable them, replace the shadow values
+   in `:root` and `.dark` with the commented values beside them. Use `0 0 #0000`
+   to disable a shadow. Tailwind combines shadows and focus rings in one
+   `box-shadow`, so `none` would also break the ring.
+
+   Components derive hover and press states from their fill or foreground
+   color at reduced opacity. The sidebar has its own accent token for
+   interactive rows, so it can be themed independently.
+
+   The Geist font is not bundled here; provide it with topcoat-font. */
+
+@import "tailwindcss";
+
+/* Scan the project's Rust sources for the Tailwind classes they use. This
+   file is installed at the project root, so `./src` is the crate's source. */
+@source "./src/**/*.rs";
+
+/* Dark mode is opted into by putting the `dark` class on an ancestor,
+   typically <html>. */
+@custom-variant dark (&:is(.dark *));
+
+/* Expose the tokens as Tailwind utilities (`bg-background`, `text-primary`,
+   `border-border`, ...). The indirection through plain variables on `:root`
+   and `.dark` is what lets the values swap when the color scheme changes. */
+@theme inline {
+  --font-sans: "Geist", sans-serif;
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-ring: var(--ring);
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-ring: var(--sidebar-ring);
+  --shadow-xs: var(--shadow-xs);
+  --shadow-sm: var(--shadow-sm);
+}
+
+:root {
+  --background: oklch(0.9875 0.003 260);
+  --foreground: oklch(0.24 0.012 260);
+  --card: oklch(0.995 0.003 260);
+  --card-foreground: oklch(0.24 0.012 260);
+  --popover: oklch(0.995 0.003 260);
+  --popover-foreground: oklch(0.24 0.012 260);
+  --muted-foreground: oklch(0.51 0.014 260);
+  --primary: oklch(0.21 0.02 260);
+  --primary-foreground: oklch(0.985 0.003 260);
+  --destructive: oklch(0.55 0.2 27);
+  --destructive-foreground: oklch(0.99 0.012 27);
+  --border: oklch(0.9 0.008 260);
+  --ring: oklch(0.32 0.02 260);
+  --sidebar: oklch(0.995 0.003 260);
+  --sidebar-foreground: oklch(0.24 0.012 260);
+  --sidebar-primary: oklch(0.21 0.02 260);
+  --sidebar-primary-foreground: oklch(0.985 0.003 260);
+  --sidebar-accent: color-mix(in oklab, var(--sidebar-foreground) 10%, var(--sidebar));
+  --sidebar-accent-foreground: oklch(0.24 0.012 260);
+  --sidebar-border: oklch(0.9 0.008 260);
+  --sidebar-ring: oklch(0.32 0.02 260);
+  /* Use these values to enable shadows:
+  --shadow-xs: 0 1px 2px oklch(0.24 0.02 260 / 12%);
+  --shadow-sm:
+    0 1px 2px oklch(0.24 0.02 260 / 10%),
+    0 2px 8px -2px oklch(0.24 0.02 260 / 9%); */
+  --shadow-xs: 0 0 #0000;
+  --shadow-sm: 0 0 #0000;
+}
+
+.dark {
+  --background: oklch(0.17 0.012 260);
+  --foreground: oklch(0.93 0.006 260);
+  --card: oklch(0.22 0.012 260);
+  --card-foreground: oklch(0.93 0.006 260);
+  --popover: oklch(0.22 0.012 260);
+  --popover-foreground: oklch(0.93 0.006 260);
+  --muted-foreground: oklch(0.68 0.012 260);
+  --primary: oklch(0.92 0.008 260);
+  --primary-foreground: oklch(0.21 0.015 260);
+  --destructive: oklch(0.66 0.18 25);
+  --destructive-foreground: oklch(0.14 0.02 25);
+  --border: oklch(0.3 0.012 260);
+  --ring: oklch(0.6 0.02 260);
+  --sidebar: oklch(0.22 0.012 260);
+  --sidebar-foreground: oklch(0.93 0.006 260);
+  --sidebar-primary: oklch(0.92 0.008 260);
+  --sidebar-primary-foreground: oklch(0.21 0.015 260);
+  --sidebar-accent: color-mix(in oklab, var(--sidebar-foreground) 10%, var(--sidebar));
+  --sidebar-accent-foreground: oklch(0.93 0.006 260);
+  --sidebar-border: oklch(0.3 0.012 260);
+  --sidebar-ring: oklch(0.6 0.02 260);
+  /* Use these values to enable shadows:
+  --shadow-xs: 0 1px 2px oklch(0 0 0 / 35%);
+  --shadow-sm:
+    0 1px 2px oklch(0 0 0 / 35%),
+    0 2px 8px -2px oklch(0 0 0 / 30%); */
+  --shadow-xs: 0 0 #0000;
+  --shadow-sm: 0 0 #0000;
+}
+
+@layer base {
+  body {
+    @apply bg-background font-sans text-foreground;
+  }
+}
+
+/* ---------- It Compiles ---------- */
+
+.crab-dance {
+  display: inline-block;
+  animation: crab 0.9s ease-in-out infinite;
+}
+@keyframes crab {
+  0%, 100% { transform: translateX(0) rotate(0); }
+  25% { transform: translateX(-3px) rotate(-12deg); }
+  75% { transform: translateX(3px) rotate(12deg); }
+}
+.post-in { animation: post-in 0.5s cubic-bezier(0.2, 0.9, 0.3, 1.2) both; }
+@keyframes post-in {
+  from { opacity: 0; transform: translateY(-12px) scale(0.98); }
+}
+.wall { background-image: radial-gradient(#e7d9c4 1px, transparent 1px); background-size: 22px 22px; }
+
+/* ---------- Mission control ---------- */
+
+.mission {
+  --bg: #050807;
+  --phos: #5cff9d;
+  --dim: color-mix(in oklab, var(--phos) 45%, #000);
+  --line: color-mix(in oklab, var(--phos) 18%, #000);
+  --glow: color-mix(in oklab, var(--phos) 10%, transparent);
+  min-height: 100vh;
+  background:
+    repeating-linear-gradient(0deg, rgb(255 255 255 / 0.025) 0 1px, transparent 1px 3px),
+    radial-gradient(ellipse at top, color-mix(in oklab, var(--phos) 9%, var(--bg)), var(--bg) 70%);
+  color: color-mix(in oklab, var(--phos) 75%, #fff);
+  font-family: "Geist Mono", ui-monospace, monospace;
+  transition: --phos 0.4s;
+}
+.mission.amber { --phos: #ffb340; }
+.mission .panel {
+  border: 1px solid var(--line);
+  background: color-mix(in oklab, var(--phos) 3%, transparent);
+  border-radius: 10px;
+  padding: 18px;
+}
+.mission .label { font-size: 11px; letter-spacing: 0.25em; text-transform: uppercase; color: var(--dim); }
+.mission .big { font-size: 44px; font-weight: 700; color: var(--phos); text-shadow: 0 0 18px var(--glow); }
+.mission .mid { font-size: 26px; font-weight: 700; color: var(--phos); }
+.mission .unit { font-size: 16px; color: var(--dim); }
+.mission .core { background: var(--glow); border-radius: 3px; overflow: hidden; }
+.mission .core-fill {
+  background: linear-gradient(to top, var(--phos), color-mix(in oklab, var(--phos) 50%, #fff));
+  box-shadow: 0 0 12px var(--phos);
+  transition: height 0.8s ease;
+}
+.mission .spark-line { fill: none; stroke: var(--phos); stroke-width: 2; vector-effect: non-scaling-stroke; }
+.mission .spark-area { fill: var(--glow); }
+.mission .hot { color: #ff5c5c; font-weight: 700; }
+.mission .tab { border: 1px solid var(--line); padding: 4px 10px; border-radius: 4px; color: var(--dim); letter-spacing: 0.15em; }
+.mission .tab.on { color: var(--bg); background: var(--phos); }
+.mission .stop { font-size: 10px; letter-spacing: 0.2em; color: #ff5c5c; border: 1px solid #ff5c5c55; padding: 2px 8px; border-radius: 4px; }
+.mission .stop:hover { background: #ff5c5c; color: #000; }
+.pulse { animation: pulse 1.4s ease-in-out infinite; box-shadow: 0 0 10px currentColor; }
+@keyframes pulse { 50% { opacity: 0.25; } }
