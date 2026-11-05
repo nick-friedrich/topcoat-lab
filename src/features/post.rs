@@ -36,10 +36,18 @@ impl Post {
     }
 
     pub async fn add(cx: &Cx, author: &str, code: &str, millis: u64) -> Result<()> {
-        let posted_at = SystemTime::now().duration_since(UNIX_EPOCH).unwrap().as_secs();
-        toasty::create!(Post { author, code, millis, posted_at })
-            .exec(&mut db(cx))
-            .await?;
+        let posted_at = SystemTime::now()
+            .duration_since(UNIX_EPOCH)
+            .unwrap()
+            .as_secs();
+        toasty::create!(Post {
+            author,
+            code,
+            millis,
+            posted_at
+        })
+        .exec(&mut db(cx))
+        .await?;
         Ok(())
     }
 }

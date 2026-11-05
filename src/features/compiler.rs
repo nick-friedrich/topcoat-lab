@@ -105,7 +105,8 @@ pub async fn check(code: &str) -> Verdict {
     let _ = stdin.write_all(code.as_bytes()).await;
     drop(stdin);
 
-    let output = match tokio::time::timeout(Duration::from_secs(5), child.wait_with_output()).await {
+    let output = match tokio::time::timeout(Duration::from_secs(5), child.wait_with_output()).await
+    {
         Ok(Ok(output)) => output,
         _ => return Verdict::refused("rustc took longer than five seconds."),
     };
@@ -115,11 +116,16 @@ pub async fn check(code: &str) -> Verdict {
         .lines()
         .filter_map(|line| serde_json::from_str::<Json>(line).ok())
         // Skip the closing "aborting due to 1 previous error" summary.
-        .filter(|d| !d.spans.is_empty() || (d.level == "error" && !d.message.starts_with("aborting")))
+        .filter(|d| {
+            !d.spans.is_empty() || (d.level == "error" && !d.message.starts_with("aborting"))
+        })
         .map(Diagnostic::from)
         .collect();
 
-    Verdict { diagnostics, millis: started.elapsed().as_millis() as u64 }
+    Verdict {
+        diagnostics,
+        millis: started.elapsed().as_millis() as u64,
+    }
 }
 
 // rustc's JSON diagnostics, only the fields the wall shows.
@@ -162,7 +168,11 @@ struct JsonChild {
 
 impl From<Json> for Diagnostic {
     fn from(json: Json) -> Self {
-        let span = json.spans.iter().find(|s| s.is_primary).or(json.spans.first());
+        let span = json
+            .spans
+            .iter()
+            .find(|s| s.is_primary)
+            .or(json.spans.first());
         let line = span.and_then(|span| {
             let text = span.text.first()?;
             Some(SourceLine {
@@ -175,7 +185,9 @@ impl From<Json> for Diagnostic {
         });
         let (code, explanation) = match json.code {
             Some(code) => {
-                let first = code.explanation.and_then(|e| e.lines().next().map(str::to_owned));
+                let first = code
+                    .explanation
+                    .and_then(|e| e.lines().next().map(str::to_owned));
                 (Some(code.code), first.filter(|line| !line.is_empty()))
             }
             None => (None, None),
@@ -189,7 +201,8 @@ impl From<Json> for Diagnostic {
             notes: json
                 .children
                 .into_iter()
-                .filter(|c| c.level == "help" || c.level == "note")
+                // Keep hints, skip "`#[warn(...)]` on by default".
+                .filter(|c| c.level == "help" || (c.level == "note" && !c.message.starts_with('`')))
                 .map(|c| format!("{}: {}", c.level, c.message))
                 .collect(),
         }

@@ -80,8 +80,12 @@ impl Telemetry {
     pub fn stop(&self, pid: u32) -> Result<String, String> {
         let mut system = System::new().map_err(|e| e.to_string())?;
         system.refresh_processes(ProcessesToUpdate::All, true);
-        let me = system.process(sysinfo::get_current_pid().unwrap()).and_then(|p| p.user_id().cloned());
-        let process = system.process(Pid::from_u32(pid)).ok_or("That process already exited.")?;
+        let me = system
+            .process(sysinfo::get_current_pid().unwrap())
+            .and_then(|p| p.user_id().cloned());
+        let process = system
+            .process(Pid::from_u32(pid))
+            .ok_or("That process already exited.")?;
         if process.user_id().cloned() != me || pid == std::process::id() {
             return Err("Not one of ours.".into());
         }
@@ -94,7 +98,9 @@ impl Telemetry {
 
     async fn sample_forever(self) {
         let mut system = System::new_all().expect("sysinfo supports macOS");
-        let me = system.process(sysinfo::get_current_pid().unwrap()).and_then(|p| p.user_id().cloned());
+        let me = system
+            .process(sysinfo::get_current_pid().unwrap())
+            .and_then(|p| p.user_id().cloned());
         let mut battery = read_battery().await;
         let mut interval = tokio::time::interval(Duration::from_secs(1));
 
@@ -115,7 +121,7 @@ impl Telemetry {
                     name: p.name().to_string_lossy().into_owned(),
                     cpu: p.cpu_usage(),
                     memory: p.memory(),
-                    ours: p.user_id().cloned() == me,
+                    ours: p.user_id().cloned() == me && p.pid().as_u32() != std::process::id(),
                 })
                 .collect();
             processes.sort_by(|a, b| b.cpu.total_cmp(&a.cpu));
@@ -125,10 +131,19 @@ impl Telemetry {
             let memory = system.used_memory() as f32 / system.total_memory() as f32 * 100.0;
             push(&mut snapshot.cpu_history, system.global_cpu_usage());
             push(&mut snapshot.memory_history, memory);
-            let load = System::load_average().map(|l| [l.one, l.five, l.fifteen]).unwrap_or_default();
+            let load = System::load_average()
+                .map(|l| [l.one, l.five, l.fifteen])
+                .unwrap_or_default();
             *snapshot = Snapshot {
-                host: System::host_name().unwrap_or_default().trim_end_matches(".fritz.box").to_owned(),
-                chip: system.cpus().first().map(|c| c.brand().to_owned()).unwrap_or_default(),
+                host: System::host_name()
+                    .unwrap_or_default()
+                    .trim_end_matches(".fritz.box")
+                    .to_owned(),
+                chip: system
+                    .cpus()
+                    .first()
+                    .map(|c| c.brand().to_owned())
+                    .unwrap_or_default(),
                 os: System::long_os_version().unwrap_or_default(),
                 uptime: System::uptime().unwrap_or(0),
                 cores: system.cpus().iter().map(|c| c.usage()).collect(),
@@ -156,7 +171,11 @@ fn push(history: &mut VecDeque<f32>, value: f32) {
 
 /// macOS has no battery API in sysinfo, so ask `pmset`.
 async fn read_battery() -> Option<Battery> {
-    let output = tokio::process::Command::new("pmset").args(["-g", "batt"]).output().await.ok()?;
+    let output = tokio::process::Command::new("pmset")
+        .args(["-g", "batt"])
+        .output()
+        .await
+        .ok()?;
     let text = String::from_utf8_lossy(&output.stdout);
     let line = text.lines().find(|l| l.contains("InternalBattery"))?;
     let fields = line.split('\t').nth(1)?;
