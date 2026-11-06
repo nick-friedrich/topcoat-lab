@@ -1,6 +1,13 @@
 # topcoat-lab
 
-A [Topcoat](https://github.com/tokio-rs/topcoat) application.
+Two small apps built with [Topcoat](https://github.com/tokio-rs/topcoat) 0.11, Tokio's full-stack Rust framework, served by one binary. Made for a YouTube video.
+
+- **It Compiles** (`/wall`): a guestbook where every message is a Rust program. A shard pipes your code into `rustc --emit=metadata --error-format=json` on every keystroke and renders the diagnostics; you can only post once it compiles. Code is type-checked, never run.
+- **Mission Control** (`/mission`): live CPU, memory, load, battery and process stats of the machine running the server, streamed with `live!`/`emit!` over a WebSocket once a second. The STOP button sends SIGTERM to processes owned by the same user.
+
+> Both apps run rustc on, and send signals from, the machine they are served on. This is a local demo, not something to put on the open internet.
+
+Requires Rust 1.99 or newer (`rustup update stable`) and macOS for the battery reading (`pmset`).
 
 ## Development
 
