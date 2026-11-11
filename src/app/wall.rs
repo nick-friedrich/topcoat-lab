@@ -87,6 +87,7 @@ pub async fn page(cx: &Cx) -> Result<impl View> {
 /// Asks rustc about the code. Runs on the server again every time the code changes.
 #[shard]
 async fn checker(
+    cx: &Cx,
     author: Signal<String>,
     code: Signal<String>,
     revision: Signal<u32>,
@@ -133,7 +134,7 @@ async fn checker(
 }
 
 #[component]
-async fn diagnostic_card(diagnostic: &compiler::Diagnostic) -> Result<impl View> {
+async fn diagnostic_card(cx: &Cx, diagnostic: &compiler::Diagnostic) -> Result<impl View> {
     let error = diagnostic.level == "error";
     Ok(view! {
         <div

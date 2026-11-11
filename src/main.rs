@@ -18,7 +18,13 @@ async fn main() {
     }
 
     let telemetry = features::telemetry::Telemetry::start();
-    topcoat::start(app::router().app_context(db).app_context(telemetry).build())
-        .await
-        .unwrap();
+    topcoat::start(
+        app::router()
+            .with(db)
+            .with(telemetry)
+            .with(features::board::Board::default())
+            .build(),
+    )
+    .await
+    .unwrap();
 }

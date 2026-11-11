@@ -1,7 +1,7 @@
 //! The database connection.
 
 use toasty::Db;
-use topcoat::context::{Cx, app_context};
+use topcoat::context::{Cx, context};
 
 /// The local SQLite database file, created when it is first opened.
 const DATABASE_URL: &str = "sqlite:data.db";
@@ -21,5 +21,5 @@ pub async fn connect() -> toasty::Result<Db> {
 /// Returns the database handle from the router's app context. Cloning it is cheap
 /// because it refers to a shared connection pool.
 pub fn db(cx: &Cx) -> Db {
-    app_context::<Db>(cx).clone()
+    context::<Db>(cx).clone()
 }

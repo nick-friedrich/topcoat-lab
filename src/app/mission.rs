@@ -2,7 +2,7 @@
 
 use topcoat::{
     Result,
-    context::{Cx, app_context},
+    context::{Cx, context},
     router::page,
     runtime::{Event, Signal, connected, procedure, shard, signal},
     view::{View, class, component, emit, live, view},
@@ -90,7 +90,7 @@ pub async fn page(cx: &Cx) -> Result<impl View> {
 #[shard]
 async fn vitals(cx: &Cx) -> Result<impl View> {
     Ok(live! {
-        let telemetry = app_context::<Telemetry>(cx);
+        let telemetry = context::<Telemetry>(cx);
         let mut ticks = telemetry.subscribe();
         loop {
             let s = telemetry.latest();
@@ -106,7 +106,7 @@ async fn vitals(cx: &Cx) -> Result<impl View> {
 }
 
 #[component]
-async fn vitals_panels(s: &Snapshot) -> Result<impl View> {
+async fn vitals_panels(cx: &Cx, s: &Snapshot) -> Result<impl View> {
     let gb = |bytes: u64| format!("{:.1}", bytes as f64 / 1_073_741_824.0);
     Ok(view! {
         <div class="grid gap-6 lg:grid-cols-3">
@@ -195,7 +195,7 @@ async fn vitals_panels(s: &Snapshot) -> Result<impl View> {
 
 /// A line chart of the last minute, drawn on the server as SVG.
 #[component]
-async fn sparkline(values: Vec<f32>) -> Result<impl View> {
+async fn sparkline(cx: &Cx, values: Vec<f32>) -> Result<impl View> {
     let step = 600.0 / (HISTORY - 1) as f32;
     let offset = (HISTORY - values.len()) as f32 * step;
     let points: Vec<String> = values
@@ -231,7 +231,7 @@ async fn sparkline(values: Vec<f32>) -> Result<impl View> {
 async fn processes(cx: &Cx, sort: String, message: Signal<String>) -> Result<impl View> {
     let by_memory = sort == "memory";
     Ok(live! {
-        let telemetry = app_context::<Telemetry>(cx);
+        let telemetry = context::<Telemetry>(cx);
         let mut ticks = telemetry.subscribe();
         loop {
             let mut list = telemetry.latest().processes;
@@ -295,7 +295,7 @@ async fn processes(cx: &Cx, sort: String, message: Signal<String>) -> Result<imp
 /// Stops a process. Only ones started by this server's user.
 #[procedure]
 pub async fn stop(cx: &Cx, pid: u32) -> Result<String> {
-    Ok(match app_context::<Telemetry>(cx).stop(pid) {
+    Ok(match context::<Telemetry>(cx).stop(pid) {
         Ok(done) => done,
         Err(refused) => refused,
     })

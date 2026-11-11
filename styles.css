@@ -206,3 +206,41 @@
 .mission .stop:hover { background: #ff5c5c; color: #000; }
 .pulse { animation: pulse 1.4s ease-in-out infinite; box-shadow: 0 0 10px currentColor; }
 @keyframes pulse { 50% { opacity: 0.25; } }
+
+/* ---------- Pixel board ---------- */
+
+.pixels {
+  background: #2a2438;
+  background-image: linear-gradient(#ffffff08 1px, transparent 1px), linear-gradient(90deg, #ffffff08 1px, transparent 1px);
+  background-size: 32px 32px;
+  color: #f4efe6;
+  font-family: "Geist Mono", monospace;
+}
+.pixels .kicker { font-size: 12px; letter-spacing: 0.3em; text-transform: uppercase; color: #ffc53d; }
+.pixels .title { font-size: 44px; font-weight: 700; letter-spacing: -0.02em; }
+.pixels .stat { font-size: 32px; font-weight: 700; line-height: 1; font-variant-numeric: tabular-nums; }
+.pixels .stat-label { font-size: 11px; letter-spacing: 0.2em; text-transform: uppercase; color: #b8b0c8; }
+.pixels .swatch { width: 36px; height: 36px; border-radius: 8px; border: 3px solid #2a2438; box-shadow: 0 0 0 2px #ffffff22; transition: transform 0.1s; }
+.pixels .swatch:hover { transform: translateY(-2px); }
+.pixels .swatch.on { box-shadow: 0 0 0 3px #f4efe6; transform: translateY(-3px); }
+.pixels .eraser { height: 36px; padding: 0 14px; border-radius: 8px; border: 2px dashed #ffffff44; font-size: 12px; letter-spacing: 0.15em; text-transform: uppercase; color: #b8b0c8; }
+.pixels .eraser.on { border-style: solid; border-color: #f4efe6; color: #f4efe6; }
+.pixels .board {
+  display: grid; gap: 1px; padding: 10px; border-radius: 14px;
+  width: min(100%, calc((100vh - 250px) * 5 / 3)); margin: 0 auto;
+  background: #1d1b22; box-shadow: 0 24px 60px #00000066;
+}
+.pixels .cell { aspect-ratio: 1; border-radius: 2px; cursor: crosshair; touch-action: none; }
+.pixels .c0 { background: #f4efe6; }
+.pixels .c1 { background: #1d1b22; }
+.pixels .c2 { background: #e5484d; }
+.pixels .c3 { background: #f76b15; }
+.pixels .c4 { background: #ffc53d; }
+.pixels .c5 { background: #46a758; }
+.pixels .c6 { background: #12a594; }
+.pixels .c7 { background: #0090ff; }
+.pixels .c8 { background: #6e56cf; }
+.pixels .c9 { background: #d6409f; }
+.pixels .c10 { background: #8d6e63; }
+.pixels .c11 { background: #ffffff; }
+.pixels .cell:hover { outline: 2px solid #ffc53d; outline-offset: -1px; position: relative; z-index: 1; }

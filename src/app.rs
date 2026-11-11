@@ -1,12 +1,20 @@
+mod api;
 mod mission;
+mod pixels;
 mod wall;
 
 use topcoat::{
     Result,
     asset::{AssetBundle, RouterBuilderAssetExt},
+    context::Cx,
     font::{Font, fontsource::fontsource_font},
-    router::{RouterBuilder, RouterBuilderDiscoverExt, Slot, href, layout, module_router, page},
-    runtime::RouterBuilderRuntimeExt,
+    metadata::Metadata,
+    openapi::{Document, OpenApi},
+    router::{
+        RouterBuilder, RouterBuilderDiscoverExt, Slot, href, layout, module_router, page, route,
+        router as current_router,
+    },
+    runtime::RuntimeLayer,
     tailwind,
     view::{View, view},
 };
@@ -23,18 +31,18 @@ pub fn router() -> RouterBuilder {
         .discover()
         .assets(AssetBundle::load().unwrap())
         // Lets the browser runtime rerun pages; register it after other layers.
-        .runtime()
+        .layer(RuntimeLayer::new())
 }
 
-#[layout]
-async fn root(slot: Slot<'_>) -> Result<impl View> {
+#[layout(with(Metadata::new().title("Topcoat Lab")))]
+async fn root(cx: &Cx, slot: Slot<'_>) -> Result<impl View> {
     Ok(view! {
         <!DOCTYPE html>
         <html lang="en">
             <head>
                 <meta charset="utf-8">
+                topcoat::metadata::tags()
                 <meta name="viewport" content="width=device-width, initial-scale=1">
-                <title>"Topcoat Lab"</title>
                 <link rel="stylesheet" href=(tailwind::stylesheet!())>
                 topcoat::font::link(font: GEIST)
                 topcoat::font::link(font: GEIST_MONO)
@@ -47,7 +55,7 @@ async fn root(slot: Slot<'_>) -> Result<impl View> {
 }
 
 #[page]
-async fn home() -> Result<impl View> {
+async fn home(cx: &Cx) -> Result<impl View> {
     Ok(view! {
         <main
             class="grid min-h-screen place-items-center bg-[#120c08] px-6 text-[#f3e6d4]"
@@ -84,4 +92,13 @@ async fn home() -> Result<impl View> {
             </div>
         </main>
     })
+}
+
+/// The OpenAPI document for everything under `/api`, generated from the router.
+#[route(GET "./openapi.json")]
+async fn spec(cx: &Cx) -> Result<Document> {
+    Ok(OpenApi::new("Pixel Board API", "1.0.0")
+        .description("Paint on the shared board from anywhere.")
+        .tag("board", "Read the board and paint pixels.")
+        .generate(&current_router(cx)))
 }
